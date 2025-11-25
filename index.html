@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake Safety Guide</title>
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --alert-red: #c0392b;
+            --text-dark: #2c3e50;
+            --bg-light: #f4f6f7;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Header --- */
+        header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        /* --- Main Content Area --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            margin-bottom: 30px;
+            color: #7f8c8d;
+            max-width: 400px;
+        }
+
+        /* --- The Emergency Button --- */
+        .emergency-btn {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            animation: pulse 2s infinite;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .emergency-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 20px rgba(231, 76, 60, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+            }
+        }
+
+        /* --- The Pop-Up Modal (Overlay) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(44, 62, 80, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Modal Content Card --- */
+        .modal-card {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            transform: translateY(50px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--alert-red);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        /* --- Action Steps --- */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .step {
+            background: #fff0f0;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .step-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .step-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .step-text p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* --- Close Button --- */
+        .close-btn {
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* SVG Icon styling */
+        svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary-red);
+        }
+
+    </style>
+</head>
+<body>
+
+    <main>
+        <p class="subtitle">Tap the button below to see emergency procedures.</p>
+        
+        <button class="emergency-btn" id="triggerBtn">
+            <svg viewBox="0 0 24 24" fill="white" style="fill:white; width: 32px; height: 32px;">
+                <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+            Earthquake<br>Strikes
+        </button>
+    </main>
+
+    <!-- The Pop-up Modal -->
+    <div class="modal-overlay" id="safetyModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Earthquake!</h2>
+                <p>Do this immediately</p>
+            </div>
+
+            <div class="steps-container">
+                <!-- Step 1 -->
+                <div class="step">
+                    <div class="step-icon">
+                        <!-- Drop Icon (Simple representation) -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z"/>
+                        </svg>
+                    </div>
+                    <div class="step-text">
+                        <h3>1. DROP</h3>
+                        <p>Drop to your hands and knees immediately.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step">
+                    <div class="step-icon">
+                         <!-- Cover Icon -->
+                         <svg viewBox="0 0 24 24">
+                            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z"/>
+                        </svg>
+                    </div>
+                    <div class="step-text">
+                        <h3>2. COVER</h3>
+                        <p>Cover your head and neck. Crawl under a sturdy table.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step">
+                    <div class="step-icon">
+                        <!-- Hold On Icon -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 9v4H6V9H4v6h16V9h-2zM4 15h16v2H4z"/>
+                        </svg>
+                    </div>
+                    <div class="step-text">
+                        <h3>3. HOLD ON</h3>
+                        <p>Hold on to your shelter until the shaking stops.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="close-btn" id="closeBtn">I am Safe</button>
+        </div>
+    </div>
+
+    <!-- Second Pop-up: Aftershock Warning -->
+    <div class="modal-overlay" id="aftershockModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 style="color: #f39c12;">⚠️ Warning</h2>
+                <p>Stay Alert</p>
+            </div>
+            <div style="padding: 10px 0 20px 0;">
+                <p style="font-size: 1.1rem; line-height: 1.5; color: #2c3e50;">
+                    <strong>Do not return to damaged buildings immediately.</strong><br><br>
+                    Aftershocks are common and can cause further collapse. Stay in an open area if possible.
+                </p>
+            </div>
+            <button class="close-btn" id="finalCloseBtn" style="background-color: #f39c12; color: #fff;">Understood</button>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const triggerBtn = document.getElementById('triggerBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const modal = document.getElementById('safetyModal');
+        
+        // Aftershock elements
+        const aftershockModal = document.getElementById('aftershockModal');
+        const finalCloseBtn = document.getElementById('finalCloseBtn');
+
+        // Function to open main modal
+        triggerBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            
+            // Optional: Vibrate device if supported (mobile feature)
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        });
+
+        // Function to switch to aftershock warning
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            // Open the warning modal after a short delay
+            setTimeout(() => {
+                aftershockModal.classList.add('active');
+            }, 200);
+        });
+
+        // Final close
+        finalCloseBtn.addEventListener('click', () => {
+            aftershockModal.classList.remove('active');
+        });
+
+        // Close if clicking outside any open modal
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+            if (e.target === aftershockModal) {
+                aftershockModal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
