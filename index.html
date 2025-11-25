@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,8 @@
             --bg-light: #f4f6f7;
             --card-bg: #ffffff;
             --monitor-bg: #2c3e50;
-            --monitor-alert-bg: #96281b; /* Dark red for alert */
+            --monitor-alert-bg: #96281b;
+            /* Dark red for alert */
         }
 
         * {
@@ -36,7 +38,7 @@
             background: white;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         h1 {
@@ -105,7 +107,8 @@
         .monitor-panel.alert-active .status-dot {
             background-color: #e74c3c;
             box-shadow: 0 0 15px #e74c3c;
-            animation: blink 0.5s infinite; /* Faster blinking */
+            animation: blink 0.5s infinite;
+            /* Faster blinking */
         }
 
         .location-data {
@@ -145,17 +148,30 @@
         /* Red Radar for Alert */
         .monitor-panel.alert-active .radar-sweep {
             background: conic-gradient(from 0deg, transparent 0deg, rgba(231, 76, 60, 0.4) 60deg, transparent 60deg);
-            animation: radar 2s linear infinite; /* Faster sweep */
+            animation: radar 2s linear infinite;
+            /* Faster sweep */
         }
 
         @keyframes radar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         /* --- Main Content Area --- */
@@ -206,10 +222,12 @@
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
             }
+
             70% {
                 transform: scale(1);
                 box-shadow: 0 0 0 20px rgba(231, 76, 60, 0);
             }
+
             100% {
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
@@ -324,14 +342,10 @@
             height: 40px;
             fill: var(--primary-red);
         }
-
     </style>
 </head>
-<body>
 
-    <header>
-        <h1>Earthquake Prep</h1>
-    </header>
+<body>
 
     <main>
         <!-- New Monitor Panel in ALERT MODE -->
@@ -348,7 +362,8 @@
                 Fetching Data...
             </div>
             <!-- New element for street address -->
-            <div class="location-data" id="streetAddress" style="font-size: 0.9rem; color: #ffcccb; margin-bottom: 10px;">
+            <div class="location-data" id="streetAddress"
+                style="font-size: 0.9rem; color: #ffcccb; margin-bottom: 10px;">
                 Searching Street...
             </div>
             <div class="location-sub" id="geoStatus">
@@ -357,17 +372,14 @@
         </div>
 
         <p class="subtitle">Tap the button below if you feel shaking.</p>
-        
+
         <button class="emergency-btn" id="triggerBtn">
             <svg viewBox="0 0 24 24" fill="white" style="fill:white; width: 32px; height: 32px;">
-                <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
             Earthquake<br>Strikes
         </button>
 
-        <p style="margin-top: 30px; font-size: 0.8rem; color: #999;">
-            Works offline. Always keep safety as priority.
-        </p>
     </main>
 
     <!-- The Pop-up Modal -->
@@ -384,7 +396,7 @@
                     <div class="step-icon">
                         <!-- Drop Icon (Simple representation) -->
                         <svg viewBox="0 0 24 24">
-                            <path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z"/>
+                            <path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z" />
                         </svg>
                     </div>
                     <div class="step-text">
@@ -396,9 +408,9 @@
                 <!-- Step 2 -->
                 <div class="step">
                     <div class="step-icon">
-                         <!-- Cover Icon -->
-                         <svg viewBox="0 0 24 24">
-                            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z"/>
+                        <!-- Cover Icon -->
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z" />
                         </svg>
                     </div>
                     <div class="step-text">
@@ -412,7 +424,7 @@
                     <div class="step-icon">
                         <!-- Hold On Icon -->
                         <svg viewBox="0 0 24 24">
-                            <path d="M18 9v4H6V9H4v6h16V9h-2zM4 15h16v2H4z"/>
+                            <path d="M18 9v4H6V9H4v6h16V9h-2zM4 15h16v2H4z" />
                         </svg>
                     </div>
                     <div class="step-text">
@@ -439,7 +451,8 @@
                     Aftershocks are common and can cause further collapse. Stay in an open area if possible.
                 </p>
             </div>
-            <button class="close-btn" id="finalCloseBtn" style="background-color: #f39c12; color: #fff;">Understood</button>
+            <button class="close-btn" id="finalCloseBtn"
+                style="background-color: #f39c12; color: #fff;">Understood</button>
         </div>
     </div>
 
@@ -451,7 +464,7 @@
         const geoCoords = document.getElementById('geoCoords');
         const geoStatus = document.getElementById('geoStatus');
         const streetAddress = document.getElementById('streetAddress'); // New element
-        
+
         // Aftershock elements
         const aftershockModal = document.getElementById('aftershockModal');
         const finalCloseBtn = document.getElementById('finalCloseBtn');
@@ -459,7 +472,7 @@
         // Function to open main modal
         triggerBtn.addEventListener('click', () => {
             modal.classList.add('active');
-            
+
             // Optional: Vibrate device if supported (mobile feature)
             if (navigator.vibrate) {
                 navigator.vibrate([200, 100, 200]);
@@ -486,10 +499,10 @@
         async function reverseGeocode(lat, lng) {
             // Simulate network delay and API fetching
             await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Mock data for demonstration
+
+            // Mock data for demonstration - RESTORED MOCK ADDRESS
             if (lat && lng) {
-                return `Near Jupiter Street, Brgy. XYZ`; 
+                return `Near City Center / Mock Address`;
             }
             return "Street data unavailable";
         }
@@ -536,4 +549,5 @@
         });
     </script>
 </body>
+
 </html>
