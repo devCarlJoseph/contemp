@@ -11,6 +11,8 @@
             --text-dark: #2c3e50;
             --bg-light: #f4f6f7;
             --card-bg: #ffffff;
+            --monitor-bg: #2c3e50;
+            --monitor-alert-bg: #96281b; /* Dark red for alert */
         }
 
         * {
@@ -40,6 +42,120 @@
         h1 {
             font-size: 1.5rem;
             color: var(--text-dark);
+        }
+
+        /* --- Monitor Panel (Updated for Alert) --- */
+        .monitor-panel {
+            background: var(--monitor-bg);
+            color: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        /* Active Alert State Class */
+        .monitor-panel.alert-active {
+            background: var(--monitor-alert-bg);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6);
+            border: 2px solid #e74c3c;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #bdc3c7;
+            z-index: 2;
+            position: relative;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        /* Alert State for Text */
+        .monitor-panel.alert-active .status-indicator {
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #2ecc71;
+            animation: blink 2s infinite;
+        }
+
+        .monitor-panel.alert-active .status-dot {
+            background-color: #e74c3c;
+            box-shadow: 0 0 15px #e74c3c;
+            animation: blink 0.5s infinite; /* Faster blinking */
+        }
+
+        .location-data {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .location-sub {
+            font-size: 0.8rem;
+            color: #95a5a6;
+            position: relative;
+            z-index: 2;
+        }
+
+        .monitor-panel.alert-active .location-sub {
+            color: #ffcccb;
+            font-weight: bold;
+        }
+
+        /* Radar Sweep Animation Background */
+        .radar-sweep {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(46, 204, 113, 0.1) 60deg, transparent 60deg);
+            animation: radar 4s linear infinite;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Red Radar for Alert */
+        .monitor-panel.alert-active .radar-sweep {
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(231, 76, 60, 0.4) 60deg, transparent 60deg);
+            animation: radar 2s linear infinite; /* Faster sweep */
+        }
+
+        @keyframes radar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         /* --- Main Content Area --- */
@@ -214,7 +330,25 @@
 <body>
 
     <main>
-        <p class="subtitle">Tap the button below to see emergency procedures.</p>
+        <!-- New Monitor Panel in ALERT MODE -->
+        <div class="monitor-panel alert-active">
+            <div class="radar-sweep"></div>
+            <div class="monitor-header">
+                <span>SEISMIC ALERT</span>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    CRITICAL
+                </div>
+            </div>
+            <div class="location-data" id="geoCoords">
+                Fetching Data...
+            </div>
+            <div class="location-sub" id="geoStatus">
+                ⚠️ MAG 6.5 TREMOR DETECTED
+            </div>
+        </div>
+
+        <p class="subtitle">Tap the button below if you feel shaking.</p>
         
         <button class="emergency-btn" id="triggerBtn">
             <svg viewBox="0 0 24 24" fill="white" style="fill:white; width: 32px; height: 32px;">
@@ -222,6 +356,7 @@
             </svg>
             Earthquake<br>Strikes
         </button>
+
     </main>
 
     <!-- The Pop-up Modal -->
@@ -302,6 +437,8 @@
         const triggerBtn = document.getElementById('triggerBtn');
         const closeBtn = document.getElementById('closeBtn');
         const modal = document.getElementById('safetyModal');
+        const geoCoords = document.getElementById('geoCoords');
+        const geoStatus = document.getElementById('geoStatus');
         
         // Aftershock elements
         const aftershockModal = document.getElementById('aftershockModal');
@@ -330,6 +467,27 @@
         finalCloseBtn.addEventListener('click', () => {
             aftershockModal.classList.remove('active');
         });
+
+        // Geolocation Logic
+        if ("geolocation" in navigator) {
+            navigator.geolocation.watchPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(4);
+                    const lng = position.coords.longitude.toFixed(4);
+                    geoCoords.textContent = `${lat}° N, ${lng}° E`;
+                    // Keep the alert message even after coords load
+                    // geoStatus.textContent = "Monitoring Active Region"; 
+                },
+                (error) => {
+                    geoCoords.textContent = "Location Unavailable";
+                    // geoStatus.textContent = "Please enable GPS";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            geoCoords.textContent = "Not Supported";
+            geoStatus.textContent = "GPS required for tracking";
+        }
 
         // Close if clicking outside any open modal
         window.addEventListener('click', (e) => {
