@@ -329,6 +329,10 @@
 </head>
 <body>
 
+    <header>
+        <h1>Earthquake Prep</h1>
+    </header>
+
     <main>
         <!-- New Monitor Panel in ALERT MODE -->
         <div class="monitor-panel alert-active">
@@ -342,6 +346,10 @@
             </div>
             <div class="location-data" id="geoCoords">
                 Fetching Data...
+            </div>
+            <!-- New element for street address -->
+            <div class="location-data" id="streetAddress" style="font-size: 0.9rem; color: #ffcccb; margin-bottom: 10px;">
+                Searching Street...
             </div>
             <div class="location-sub" id="geoStatus">
                 ⚠️ MAG 6.5 TREMOR DETECTED
@@ -357,6 +365,9 @@
             Earthquake<br>Strikes
         </button>
 
+        <p style="margin-top: 30px; font-size: 0.8rem; color: #999;">
+            Works offline. Always keep safety as priority.
+        </p>
     </main>
 
     <!-- The Pop-up Modal -->
@@ -411,7 +422,7 @@
                 </div>
             </div>
 
-            <button class="close-btn" id="closeBtn">I am Safe</button>
+            <button class="close-btn" id="closeBtn">I am Safe / Close</button>
         </div>
     </div>
 
@@ -439,6 +450,7 @@
         const modal = document.getElementById('safetyModal');
         const geoCoords = document.getElementById('geoCoords');
         const geoStatus = document.getElementById('geoStatus');
+        const streetAddress = document.getElementById('streetAddress'); // New element
         
         // Aftershock elements
         const aftershockModal = document.getElementById('aftershockModal');
@@ -468,24 +480,48 @@
             aftershockModal.classList.remove('active');
         });
 
+        // Mock Reverse Geocoding Function (Simulated API call)
+        // NOTE: Real-world street addresses require a paid reverse geocoding API.
+        // This function simulates the successful retrieval process.
+        async function reverseGeocode(lat, lng) {
+            // Simulate network delay and API fetching
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Mock data for demonstration
+            if (lat && lng) {
+                return `Near Jupiter Street, Brgy. XYZ`; 
+            }
+            return "Street data unavailable";
+        }
+
         // Geolocation Logic
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(
-                (position) => {
+                async (position) => { // Made the callback async
                     const lat = position.coords.latitude.toFixed(4);
                     const lng = position.coords.longitude.toFixed(4);
                     geoCoords.textContent = `${lat}° N, ${lng}° E`;
-                    // Keep the alert message even after coords load
-                    // geoStatus.textContent = "Monitoring Active Region"; 
+
+                    // 2. Fetch Street Address
+                    try {
+                        streetAddress.textContent = "Loading Street...";
+                        const address = await reverseGeocode(lat, lng);
+                        streetAddress.textContent = address;
+                    } catch (e) {
+                        streetAddress.textContent = "Street unavailable (API error)";
+                        console.error("Reverse Geocoding Failed:", e);
+                    }
                 },
                 (error) => {
                     geoCoords.textContent = "Location Unavailable";
-                    // geoStatus.textContent = "Please enable GPS";
+                    streetAddress.textContent = "Cannot pinpoint location.";
+                    // geoStatus.textContent = "Please enable GPS"; // Alert status remains
                 },
                 { enableHighAccuracy: true }
             );
         } else {
             geoCoords.textContent = "Not Supported";
+            streetAddress.textContent = "Geolocating not supported.";
             geoStatus.textContent = "GPS required for tracking";
         }
 
