@@ -2,11 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Earthquake Safety and SOS App — Full Version</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake Safety App — Full Version</title>
     <style>
-        /* --- CSS STYLES --- */
         :root {
             --primary-red: #e74c3c;
             --alert-red: #c0392b;
@@ -25,19 +24,21 @@
         }
 
         body {
-            background-color: var(--bg-light);
+            background: var(--bg-light);
             color: var(--text-dark);
-            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        header {
-            background: white;
-            padding: 20px;
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
         }
 
         .monitor-panel {
@@ -48,16 +49,12 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
             position: relative;
             overflow: hidden;
-            transition: background 0.3s;
         }
 
         .monitor-panel.alert-active {
             background: var(--monitor-alert-bg);
-            box-shadow: 0 0 25px rgba(231, 76, 60, 0.6);
-            border: 2px solid #e74c3c;
         }
 
         .monitor-header {
@@ -67,86 +64,27 @@
             margin-bottom: 15px;
             font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #bdc3c7;
-            z-index: 2;
-            position: relative;
         }
 
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: #2ecc71;
             font-weight: bold;
-        }
-
-        .monitor-panel.alert-active .status-indicator {
-            color: #fff;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            color: #2ecc71;
         }
 
         .status-dot {
             width: 10px;
             height: 10px;
-            background-color: #2ecc71;
             border-radius: 50%;
-            box-shadow: 0 0 10px #2ecc71;
+            background: #2ecc71;
             animation: blink 2s infinite;
         }
 
         .monitor-panel.alert-active .status-dot {
-            background-color: #e74c3c;
-            box-shadow: 0 0 15px #e74c3c;
+            background: #e74c3c;
             animation: blink 0.5s infinite;
-        }
-
-        .location-data {
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .location-sub {
-            font-size: 0.8rem;
-            color: #95a5a6;
-            position: relative;
-            z-index: 2;
-        }
-
-        .monitor-panel.alert-active .location-sub {
-            color: #ffcccb;
-            font-weight: bold;
-        }
-
-        .radar-sweep {
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(46, 204, 113, 0.1) 60deg, transparent 60deg);
-            animation: radar 4s linear infinite;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .monitor-panel.alert-active .radar-sweep {
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(231, 76, 60, 0.4) 60deg, transparent 60deg);
-            animation: radar 2s linear infinite;
-        }
-
-        @keyframes radar {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
         }
 
         @keyframes blink {
@@ -161,41 +99,38 @@
             }
         }
 
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
+        .location-data {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
         }
 
-        p.subtitle {
-            margin-bottom: 30px;
-            color: #7f8c8d;
-            max-width: 400px;
+        .location-sub {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+
+        .monitor-panel.alert-active .location-sub {
+            color: #ffcccb;
+            font-weight: bold;
         }
 
         .emergency-btn {
-            background-color: var(--primary-red);
+            background: var(--primary-red);
             color: white;
             border: none;
             border-radius: 50%;
             width: 180px;
             height: 180px;
-            font-size: 1.2rem;
             font-weight: bold;
-            text-transform: uppercase;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
-            animation: pulse 2s infinite;
-            transition: transform 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            animation: pulse 2s infinite;
         }
 
         .emergency-btn:active {
@@ -205,17 +140,14 @@
         @keyframes pulse {
             0% {
                 transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
             }
 
             70% {
                 transform: scale(1);
-                box-shadow: 0 0 0 20px rgba(231, 76, 60, 0);
             }
 
             100% {
                 transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
             }
         }
 
@@ -225,15 +157,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(44, 62, 80, 0.95);
+            background: rgba(44, 62, 80, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            backdrop-filter: blur(5px);
+            transition: 0.3s;
+            z-index: 999;
         }
 
         .modal-overlay.active {
@@ -248,10 +179,10 @@
             border-radius: 20px;
             padding: 30px 20px;
             text-align: center;
-            transform: translateY(50px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-height: 90vh;
             overflow-y: auto;
+            transform: translateY(50px);
+            transition: transform 0.3s;
         }
 
         .modal-overlay.active .modal-card {
@@ -265,9 +196,7 @@
         }
 
         .modal-header h2 {
-            color: var(--alert-red);
             font-size: 1.8rem;
-            text-transform: uppercase;
         }
 
         .steps-container {
@@ -283,7 +212,6 @@
             border-radius: 12px;
             display: flex;
             align-items: center;
-            text-align: left;
             border-left: 5px solid var(--primary-red);
         }
 
@@ -292,22 +220,6 @@
             margin-right: 15px;
             min-width: 50px;
             text-align: center;
-        }
-
-        .step-icon svg {
-            width: 40px;
-            height: 40px;
-            fill: var(--primary-red);
-        }
-
-        .step-text h3 {
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-
-        .step-text p {
-            font-size: 0.9rem;
-            color: #666;
         }
 
         .button-group {
@@ -322,9 +234,7 @@
             color: white;
             border: none;
             padding: 15px;
-            width: 100%;
             border-radius: 10px;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
         }
@@ -334,9 +244,7 @@
             color: white;
             border: none;
             padding: 15px;
-            width: 100%;
             border-radius: 10px;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             animation: sos-pulse 1s infinite;
@@ -368,7 +276,6 @@
             color: var(--text-dark);
             margin-bottom: 10px;
             display: block;
-            cursor: pointer;
         }
 
         .map-link {
@@ -389,12 +296,11 @@
 
 <body>
     <main>
-        <div class="monitor-panel alert-active" role="region" aria-live="polite" aria-label="Seismic alert monitor">
-            <div class="radar-sweep" aria-hidden="true"></div>
+        <div class="monitor-panel alert-active">
             <div class="monitor-header">
                 <span>SEISMIC ALERT</span>
-                <div class="status-indicator" id="statusIndicator">
-                    <div class="status-dot" aria-hidden="true"></div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
                     CRITICAL
                 </div>
             </div>
@@ -404,8 +310,8 @@
 
         <p class="subtitle">Tap below if you feel shaking.</p>
 
-        <button class="emergency-btn" id="triggerBtn" aria-haspopup="dialog" aria-controls="safetyModal">
-            <svg viewBox="0 0 24 24" fill="white" style="width: 32px; height: 32px;">
+        <button class="emergency-btn" id="triggerBtn">
+            <svg viewBox="0 0 24 24" fill="white" style="width:32px;height:32px;">
                 <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
             Earthquake<br>Strikes
@@ -413,11 +319,10 @@
     </main>
 
     <!-- Safety Modal -->
-    <div class="modal-overlay" id="safetyModal" data-modal>
-        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="safetyTitle">
+    <div class="modal-overlay" id="safetyModal">
+        <div class="modal-card">
             <div class="modal-header">
-                <h2 id="safetyTitle">Action Required</h2>
-                <p>Do this immediately</p>
+                <h2>Action Required</h2>
             </div>
             <div class="steps-container">
                 <div class="step">
@@ -449,21 +354,35 @@
         </div>
     </div>
 
-    <!-- SOS Modal -->
-    <div class="modal-overlay" id="sosModal" data-modal>
-        <div class="modal-card" style="border: 3px solid red;" role="dialog" aria-modal="true"
-            aria-labelledby="sosTitle">
+    <!-- Safe Modal -->
+    <div class="modal-overlay" id="safeModal">
+        <div class="modal-card">
             <div class="modal-header">
-                <h2 id="sosTitle" style="color: red;">SOS SIGNAL</h2>
-                <p>Rescuers need your location</p>
+                <h2>✅ You are Safe</h2>
+            </div>
+            <div class="location-box">
+                <span class="coords-text" id="safeCoords">Locating...</span>
+                <a href="#" target="_blank" id="safeMapLink" class="map-link" style="display:none;">Open in Google
+                    Maps</a>
+            </div>
+            <button class="btn-safe"
+                onclick="document.getElementById('safeModal').classList.remove('active')">Close</button>
+        </div>
+    </div>
+
+    <!-- SOS Modal -->
+    <div class="modal-overlay" id="sosModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>🚨 SOS Signal</h2>
             </div>
             <div class="location-box">
                 <span class="coords-text" id="sosCoords">Locating...</span>
-                <a href="#" target="_blank" rel="noopener noreferrer" class="map-link" id="googleMapLink"
-                    aria-label="Open location in Google Maps" style="display:none;">Open in Google Maps</a>
-                <div class="small-note" id="sosNote" style="display:none;"></div>
+                <a href="#" target="_blank" id="sosMapLink" class="map-link" style="display:none;">Open in Google
+                    Maps</a>
             </div>
-            <button class="btn-safe" style="background: #34495e;" id="closeSosBtn">Close</button>
+            <button class="btn-safe"
+                onclick="document.getElementById('sosModal').classList.remove('active')">Close</button>
         </div>
     </div>
 
@@ -472,90 +391,96 @@
         const safetyModal = document.getElementById('safetyModal');
         const iAmSafeBtn = document.getElementById('iAmSafeBtn');
         const notSafeBtn = document.getElementById('notSafeBtn');
+        const safeModal = document.getElementById('safeModal');
         const sosModal = document.getElementById('sosModal');
-        const sosCoords = document.getElementById('sosCoords');
-        const googleMapLink = document.getElementById('googleMapLink');
-        const closeSosBtn = document.getElementById('closeSosBtn');
+        const safeCoords = document.getElementById('safeCoords');
+        const safeMapLink = document.getElementById('safeMapLink');
+        const sosCoordsEl = document.getElementById('sosCoords');
+        const sosMapLink = document.getElementById('sosMapLink');
         const geoCoords = document.getElementById('geoCoords');
         const geoStatus = document.getElementById('geoStatus');
-        const sosNote = document.getElementById('sosNote');
 
-        let currentLatitude = null;
-        let currentLongitude = null;
-        let accuracyRadius = null;
-        let currentAddress = "";
+        let lat = null, lon = null;
 
         function formatLatLon(lat, lon) {
             if (lat === null || lon === null) return "Unknown";
-            const latHem = lat >= 0 ? "N" : "S";
-            const lonHem = lon >= 0 ? "E" : "W";
-            return `${lat.toFixed(6)}° ${latHem}, ${lon.toFixed(6)}° ${lonHem}`;
-        }
-        function buildGoogleMapsUrl(lat, lon) {
-            return `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`;
+            const latH = lat >= 0 ? "N" : "S";
+            const lonH = lon >= 0 ? "E" : "W";
+            return `${lat.toFixed(6)}° ${latH}, ${lon.toFixed(6)}° ${lonH}`;
         }
 
-        // Trigger safety modal
-        triggerBtn.addEventListener('click', () => {
-            safetyModal.classList.add('active');
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-        });
+        function buildMapsUrl(lat, lon) {
+            return `https://www.google.com/maps?q=${lat},${lon}`;
+        }
 
-        // Safe button closes modal
+        // CallMeBot WhatsApp API
+        function sendWhatsAppLocation(lat, lon) {
+            const phone = '09484665123';
+            const apikey = 'ZfM7GoyYF2sX';
+            const text = encodeURIComponent(`🚨 EMERGENCY! User needs help. Location: https://www.google.com/maps?q=${lat},${lon}`);
+            const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${text}&apikey=${apikey}`;
+
+            fetch(url)
+                .then(res => res.ok ? console.log('✅ WhatsApp sent!') : console.error('❌ Failed', res.status))
+                .catch(err => console.error('❌ Error', err));
+        }
+
+        triggerBtn.addEventListener('click', () => safetyModal.classList.add('active'));
+
+        // I am Safe
         iAmSafeBtn.addEventListener('click', () => {
             safetyModal.classList.remove('active');
+            safeModal.classList.add('active');
+            if (lat !== null && lon !== null) {
+                safeCoords.textContent = formatLatLon(lat, lon);
+                safeMapLink.href = buildMapsUrl(lat, lon);
+                safeMapLink.style.display = 'inline-block';
+            } else {
+                safeCoords.textContent = "Waiting for GPS...";
+                safeMapLink.style.display = 'none';
+            }
+            alert("✅ You are marked safe. Do NOT return to the building due to possible aftershocks.");
         });
 
-        // "Need Help" opens SOS modal
+        // I am Not Safe
         notSafeBtn.addEventListener('click', () => {
             safetyModal.classList.remove('active');
             sosModal.classList.add('active');
-            updateSosUI();
-        });
 
-        // Close SOS
-        closeSosBtn.addEventListener('click', () => sosModal.classList.remove('active'));
+            if (lat !== null && lon !== null) {
+                sosCoordsEl.textContent = formatLatLon(lat, lon);
+                sosMapLink.href = buildMapsUrl(lat, lon);
+                sosMapLink.style.display = 'inline-block';
 
-        // Update SOS modal
-        function updateSosUI() {
-            if (currentLatitude !== null && currentLongitude !== null) {
-                sosCoords.innerHTML = `<div style="font-size:1.4rem;color:#c0392b;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div>`;
-                googleMapLink.href = buildGoogleMapsUrl(currentLatitude, currentLongitude);
-                googleMapLink.style.display = 'inline-block';
+                sendWhatsAppLocation(lat, lon);
+                alert('🚨 Your location has been sent to emergency contacts!');
             } else {
-                sosCoords.textContent = "Waiting for GPS Signal...";
-                googleMapLink.style.display = 'none';
+                sosCoordsEl.textContent = "Waiting for GPS...";
+                sosMapLink.style.display = 'none';
+                alert('Waiting for GPS to determine your location...');
             }
-        }
+        });
 
         // Geolocation
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(pos => {
-                currentLatitude = pos.coords.latitude;
-                currentLongitude = pos.coords.longitude;
-                accuracyRadius = pos.coords.accuracy;
-                geoCoords.textContent = formatLatLon(currentLatitude, currentLongitude);
-                geoStatus.textContent = `Accuracy: within ${Math.round(accuracyRadius)} meters`;
-                updateSosUI();
-            }, error => {
+                lat = pos.coords.latitude;
+                lon = pos.coords.longitude;
+                geoCoords.textContent = formatLatLon(lat, lon);
+                geoStatus.textContent = `Accuracy: ${Math.round(pos.coords.accuracy)} m`;
+            }, err => {
                 geoCoords.textContent = "Location Error";
                 geoStatus.textContent = "Enable GPS / permissions";
-            }, {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            });
+            }, { enableHighAccuracy: true });
         } else {
             geoCoords.textContent = "No GPS Support";
             geoStatus.textContent = "Browser does not support geolocation";
         }
 
-        // Close modals clicking outside
+        // Close modal on overlay click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', e => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
+                if (e.target === modal) modal.classList.remove('active');
             });
         });
     </script>
