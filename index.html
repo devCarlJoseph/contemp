@@ -454,7 +454,7 @@
             <svg viewBox="0 0 24 24" fill="white" style="width:36px;height:36px;">
                 <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
-            EARTHQUAKE DETECTED – TAP FOR ACTION
+            EARTHQUAKE DETECTED !! <br> TAP FOR ACTION
         </button>
     </main>
 
@@ -624,15 +624,20 @@
 
         // Geolocation
         if ("geolocation" in navigator) {
-            navigator.geolocation.watchPosition(pos => {
-                lat = pos.coords.latitude;
-                lon = pos.coords.longitude;
-                geoCoords.textContent = formatLatLon(lat, lon);
-                geoStatus.textContent = `Accuracy: ${Math.round(pos.coords.accuracy)} m`;
-            }, err => {
-                geoCoords.textContent = "Location Error";
-                geoStatus.textContent = "Enable GPS / permissions";
-            }, { enableHighAccuracy: true });
+            navigator.geolocation.watchPosition(
+                pos => {
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                    geoCoords.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                    geoStatus.textContent = `Accuracy: ${pos.coords.accuracy} meters`;
+                },
+                err => {
+                    geoCoords.textContent = "Location Error";
+                    geoStatus.textContent = "Enable GPS / permissions";
+                },
+                { enableHighAccuracy: true }
+            );
+
         } else {
             geoCoords.textContent = "No GPS Support";
             geoStatus.textContent = "Browser does not support geolocation";
