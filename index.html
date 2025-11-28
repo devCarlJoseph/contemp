@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earthquake Safety and SOS App</title>
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Earthquake Safety and SOS App — Fixed</title>
     <style>
-        /* --- CSS STYLES --- */
+        /* --- CSS STYLES (unchanged except small overlay improvements) --- */
         :root {
             --primary-red: #e74c3c; --alert-red: #c0392b; --sos-red: #ff0000;
             --text-dark: #2c3e50; --bg-light: #f4f6f7;
@@ -53,17 +52,17 @@
         .location-box { background: #f8f9fa; border: 2px dashed #95a5a6; padding: 15px; margin: 15px 0; border-radius: 8px; word-break: break-all; }
         .coords-text { font-family: monospace; font-size: 1.2rem; font-weight: bold; color: var(--text-dark); margin-bottom: 10px; display: block; }
         .map-link { display: inline-block; text-decoration: none; color: #3498db; font-weight: bold; font-size: 0.9rem; }
+        .small-note { font-size: 0.85rem; color: #777; margin-top: 8px; }
     </style>
 </head>
 <body>
-
     <main>
-        <div class="monitor-panel alert-active">
-            <div class="radar-sweep"></div>
+        <div class="monitor-panel alert-active" role="region" aria-live="polite" aria-label="Seismic alert monitor">
+            <div class="radar-sweep" aria-hidden="true"></div>
             <div class="monitor-header">
                 <span>SEISMIC ALERT</span>
-                <div class="status-indicator">
-                    <div class="status-dot"></div>
+                <div class="status-indicator" id="statusIndicator">
+                    <div class="status-dot" aria-hidden="true"></div>
                     CRITICAL
                 </div>
             </div>
@@ -72,8 +71,8 @@
         </div>
 
         <p class="subtitle">Tap below if you feel shaking.</p>
-        
-        <button class="emergency-btn" id="triggerBtn">
+
+        <button class="emergency-btn" id="triggerBtn" aria-haspopup="dialog" aria-controls="safetyModal">
             <svg viewBox="0 0 24 24" fill="white" style="width: 32px; height: 32px;">
                 <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
             </svg>
@@ -81,9 +80,10 @@
         </button>
     </main>
 
-    <div class="modal-overlay" id="safetyModal">
-        <div class="modal-card">
-            <div class="modal-header"><h2>Action Required</h2><p>Do this immediately</p></div>
+    <!-- Safety Modal (Drop, Cover, Hold on) -->
+    <div class="modal-overlay" id="safetyModal" data-modal>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="safetyTitle">
+            <div class="modal-header"><h2 id="safetyTitle">Action Required</h2><p>Do this immediately</p></div>
             <div class="steps-container">
                 <div class="step"><div class="step-icon"><svg viewBox="0 0 24 24"><path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z"/></svg></div><div class="step-text"><h3>1. DROP</h3><p>Drop to your hands and knees.</p></div></div>
                 <div class="step"><div class="step-icon"><svg viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z"/></svg></div><div class="step-text"><h3>2. COVER</h3><p>Cover head/neck. Get under a table.</p></div></div>
@@ -97,15 +97,17 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="sosModal">
-        <div class="modal-card" style="border: 3px solid red;">
-            <div class="modal-header"><h2 style="color: red;">SOS SIGNAL</h2><p>Rescuers need your location</p></div>
-            
+    <!-- SOS Modal -->
+    <div class="modal-overlay" id="sosModal" data-modal>
+        <div class="modal-card" style="border: 3px solid red;" role="dialog" aria-modal="true" aria-labelledby="sosTitle">
+            <div class="modal-header"><h2 id="sosTitle" style="color: red;">SOS SIGNAL</h2><p>Rescuers need your location</p></div>
+
             <p>Show this screen to rescuers or send these coordinates:</p>
 
             <div class="location-box">
                 <span class="coords-text" id="sosCoords">Locating...</span>
-                <a href="#" target="_blank" class="map-link" id="googleMapLink">Open in Google Maps</a>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="map-link" id="googleMapLink" aria-label="Open location in Google Maps" style="display:none;">Open in Google Maps</a>
+                <div class="small-note" id="sosNote" style="display:none;"></div>
             </div>
             <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;">
                 Keep making noise. Do not light matches.
@@ -115,9 +117,10 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="aftershockModal">
-        <div class="modal-card">
-            <div class="modal-header"><h2 style="color: #f39c12;">⚠️ Warning</h2><p>Stay Alert</p></div>
+    <!-- Aftershock Modal -->
+    <div class="modal-overlay" id="aftershockModal" data-modal>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="aftershockTitle">
+            <div class="modal-header"><h2 id="aftershockTitle" style="color: #f39c12;">⚠️ Warning</h2><p>Stay Alert</p></div>
             <div style="padding: 10px 0 20px 0;">
                 <p style="font-size: 1.1rem; line-height: 1.5; color: #2c3e50;">
                     <strong>Do not return to damaged buildings.</strong><br><br>
@@ -142,94 +145,126 @@
         const finalCloseBtn = document.getElementById('finalCloseBtn');
         const geoCoords = document.getElementById('geoCoords');
         const geoStatus = document.getElementById('geoStatus');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const sosNote = document.getElementById('sosNote');
 
+        // Use numeric values for latitude/longitude internally (or null)
         let currentLatitude = null;
         let currentLongitude = null;
         let accuracyRadius = null;
-        let currentAddress = "Address Not Fetched"; 
+        let currentAddress = "Address Not Fetched";
 
         // ⚠️ 1. UPDATE THIS WITH YOUR FIREBASE/SUPABASE REALTIME ENDPOINT ⚠️
-        // This must be your unique URL ending in /sos_alerts.json
-        const RESCUER_API_ENDPOINT = "https://your-unique-firebase-app.firebaseio.com/sos_alerts.json"; 
-        // ------------------------------------------------------------------
+        // This must be your unique URL ending in /sos_alerts.json (or the correct endpoint for your backend)
+        // If you don't have a backend yet, set to null to avoid accidental network calls.
+        const RESCUER_API_ENDPOINT = null; // e.g. "https://your-unique-firebase-app.firebaseio.com/sos_alerts.json"
 
-        // --- Core Functions ---
+        // --- Helper utilities ---
+        function formatLatLon(lat, lon) {
+            // lat/lon are numbers here
+            const latFixed = (lat !== null && lat !== undefined) ? lat.toFixed(6) : '—';
+            const lonFixed = (lon !== null && lon !== undefined) ? lon.toFixed(6) : '—';
+            const latHem = lat >= 0 ? 'N' : 'S';
+            const lonHem = lon >= 0 ? 'E' : 'W';
+            return `${latFixed}° ${latHem}, ${lonFixed}° ${lonHem}`;
+        }
 
-        // Function to send data to the external server (The Missing Backend)
+        // --- Network helpers ---
+
+        // Build a Google Maps URL (works on mobile & desktop)
+        function buildGoogleMapsUrl(lat, lon) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`;
+        }
+
+        // Function to get Street Address from OpenStreetMap (Nominatim)
+        // Note: Setting custom User-Agent headers from a browser is restricted.
+        // Nominatim policies recommend including an `email` parameter for identification.
+        // Replace 'your-email@example.com' below with a real contact email or proxy this request via your server.
+        async function fetchAddress(lat, lon) {
+            if (lat === null || lon === null) return null;
+            const safeLat = encodeURIComponent(lat);
+            const safeLon = encodeURIComponent(lon);
+            // Add email parameter per Nominatim policy. Replace with a legit email if possible.
+            const emailParam = encodeURIComponent('your-email@example.com'); // <-- replace
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${safeLat}&lon=${safeLon}&accept-language=en&email=${emailParam}`;
+
+            try {
+                const response = await fetch(url, {
+                    // Do not try to set the "User-Agent" header here — browsers block it.
+                    // If you need guaranteed address resolution, proxy the request through your server and set User-Agent there.
+                    method: 'GET'
+                });
+                if (!response.ok) throw new Error('Nominatim response not ok');
+                const data = await response.json();
+                if (data && data.display_name) {
+                    return data.display_name;
+                }
+                return null;
+            } catch (err) {
+                console.warn('Address fetch failed:', err);
+                return null;
+            }
+        }
+
+        // Function to send data to the external server (Firebase / Supabase / your backend)
+        // If RESCUER_API_ENDPOINT is null, we won't attempt to POST and will show message instead.
         async function sendSOSSignal(lat, lon, address) {
+            if (!RESCUER_API_ENDPOINT) {
+                // don't attempt to POST if endpoint isn't configured
+                console.info('RESCUER_API_ENDPOINT is not configured. Skipping POST.');
+                sosNote.textContent = 'Backend NOT configured — copy the location or use the Google Maps link.';
+                sosNote.style.display = 'block';
+                return { ok: false, reason: 'NO_ENDPOINT' };
+            }
+
             const payload = {
                 timestamp: new Date().toISOString(),
-                latitude: lat,
-                longitude: lon,
-                map_link: `http://googleusercontent.com/maps.google.com/7{lat},{lon}`,
-                human_address: address,
-                accuracy_m: Math.round(accuracyRadius),
+                latitude: Number(lat),
+                longitude: Number(lon),
+                map_link: buildGoogleMapsUrl(lat, lon),
+                human_address: address || null,
+                accuracy_m: accuracyRadius ? Math.round(accuracyRadius) : null,
                 status: "CRITICAL_HELP_NEEDED"
             };
-            
+
             try {
                 const response = await fetch(RESCUER_API_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 if (response.ok) {
-                    alert("✅ SOS Signal Sent! Rescuers are notified.");
+                    return { ok: true };
                 } else {
-                    // This is the error user previously saw. Likely a Firebase Rules issue.
-                    console.error("❌ Failed to send SOS signal. Server response error.", response);
-                    alert("Error sending SOS! Please try sharing location manually.");
+                    const text = await response.text().catch(()=>null);
+                    console.error('SOS server returned error', response.status, text);
+                    return { ok: false, reason: 'SERVER_ERROR', status: response.status, text };
                 }
             } catch (e) {
-                // This is a network failure error (no internet).
-                console.error("❌ Network error during SOS transmission.", e);
-                alert("NETWORK FAILED! No signal. Please use the Google Maps link to share location manually if possible.");
-            }
-        }
-        
-        // Function to get Street Address from OpenStreetMap
-        async function fetchAddress(lat, lon) {
-            if (!lat || !lon) return;
-            sosCoords.innerHTML = `${lat}, ${lon}<br><span style="font-size:0.8rem; color:#666;">Fetching address...</span>`;
-
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                const data = await response.json();
-                
-                if (data && data.display_name) {
-                    currentAddress = data.display_name; 
-                    sosCoords.innerHTML = `
-                        <div style="font-size: 1.4rem; color: #c0392b;">${lat}, ${lon}</div>
-                        <div style="font-size: 0.9rem; margin-top: 5px; color: #333; border-top: 1px solid #ddd; padding-top: 5px;">
-                            ${currentAddress}
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                currentAddress = "Address unavailable (No Internet)";
-                sosCoords.innerHTML = `${lat}, ${lon}<br><span style="font-size:0.8rem; color:red;">Address unavailable (No Internet)</span>`;
+                console.error('Network error during SOS transmission.', e);
+                return { ok: false, reason: 'NETWORK_ERROR', error: e };
             }
         }
 
-        // Updates the location link in the SOS modal
+        // Updates the SOS UI elements
         function updateSosUI() {
-            if (currentLatitude && currentLongitude) {
-                const mapUrl = `http://googleusercontent.com/maps.google.com/8{currentLatitude},${currentLongitude}`;
-                googleMapLink.href = mapUrl;
-                googleMapLink.textContent = `📍 Open Location (Accuracy: ${Math.round(accuracyRadius)}m)`;
-                googleMapLink.style.display = "inline-block";
+            if (currentLatitude !== null && currentLongitude !== null) {
+                sosCoords.innerHTML = `<div style="font-size: 1.4rem; color: #c0392b;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div>`;
+                googleMapLink.href = buildGoogleMapsUrl(currentLatitude, currentLongitude);
+                googleMapLink.textContent = `📍 Open Location (Accuracy: ${accuracyRadius ? Math.round(accuracyRadius) : '—'} m)`;
+                googleMapLink.style.display = 'inline-block';
             } else {
                 sosCoords.textContent = "Waiting for GPS Signal...";
-                googleMapLink.style.display = "none";
+                googleMapLink.style.display = 'none';
             }
         }
-
 
         // --- Event Handlers ---
         triggerBtn.addEventListener('click', () => {
             safetyModal.classList.add('active');
-            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            // small vibrate feedback if available
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         });
 
         iAmSafeBtn.addEventListener('click', () => {
@@ -237,48 +272,131 @@
             setTimeout(() => { aftershockModal.classList.add('active'); }, 300);
         });
 
-        notSafeBtn.addEventListener('click', () => {
+        notSafeBtn.addEventListener('click', async () => {
             safetyModal.classList.remove('active');
             sosModal.classList.add('active');
-            updateSosUI(); 
-            
-            // Critical steps: Send signal AND fetch readable address
-            if (currentLatitude && currentLongitude) {
-                sendSOSSignal(currentLatitude, currentLongitude, currentAddress); 
+            updateSosUI();
+
+            // Attempt to fetch address first (so backend receives human-readable address when possible)
+            // If address fetch fails, we still send coordinates.
+            let resolvedAddress = currentAddress;
+            if (currentLatitude !== null && currentLongitude !== null) {
+                // indicate "fetching..." in UI
+                sosCoords.innerHTML = `<div style="font-size: 1.1rem; color:#666;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div><div style="font-size:0.85rem;color:#666;margin-top:6px;">Fetching address...</div>`;
+                const addr = await fetchAddress(currentLatitude, currentLongitude);
+                if (addr) {
+                    currentAddress = addr;
+                    resolvedAddress = addr;
+                    sosCoords.innerHTML = `
+                        <div style="font-size: 1.4rem; color: #c0392b;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div>
+                        <div style="font-size: 0.9rem; margin-top: 5px; color: #333; border-top: 1px solid #ddd; padding-top: 5px;">
+                            ${currentAddress}
+                        </div>
+                    `;
+                } else {
+                    // show coordinates and note
+                    sosCoords.innerHTML = `<div style="font-size:1.2rem;color:#c0392b;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div><div style="font-size:0.85rem;color:red;margin-top:6px;">Address unavailable</div>`;
+                }
+
+                // Now send the SOS signal (attempt)
+                const sendResult = await sendSOSSignal(currentLatitude, currentLongitude, resolvedAddress);
+                if (sendResult.ok) {
+                    alert('✅ SOS Signal Sent! Rescuers are notified.');
+                    sosNote.style.display = 'none';
+                } else {
+                    // Show helpful UI note and don't spam with alerts
+                    console.warn('SOS send result', sendResult);
+                    sosNote.textContent = (sendResult.reason === 'NO_ENDPOINT') ? 'Backend not configured. Please share location manually.' : 'Failed to send SOS automatically. Use Google Maps link to share location.';
+                    sosNote.style.display = 'block';
+                    if (sendResult.reason === 'NETWORK_ERROR') {
+                        alert('NETWORK FAILED! No signal. Please use the Google Maps link to share your location manually if possible.');
+                    } else if (sendResult.reason === 'SERVER_ERROR') {
+                        alert('Error sending SOS! Server rejected the request. Please try sharing location manually.');
+                    }
+                }
+            } else {
+                // No GPS yet
+                sosCoords.textContent = "Waiting for GPS Signal...";
+                sosNote.textContent = 'No GPS signal. Try moving to clearer sky or enable location permissions.';
+                sosNote.style.display = 'block';
             }
-            fetchAddress(currentLatitude, currentLongitude); 
         });
 
-        closeSosBtn.addEventListener('click', () => { sosModal.classList.remove('active'); });
+        closeSosBtn.addEventListener('click', () => { sosModal.classList.remove('active'); sosNote.style.display = 'none'; });
         finalCloseBtn.addEventListener('click', () => { aftershockModal.classList.remove('active'); });
 
         // --- Geolocation Initialization ---
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(
                 (position) => {
-                    // Update global variables with high precision data
-                    currentLatitude = position.coords.latitude.toFixed(6);
-                    currentLongitude = position.coords.longitude.toFixed(6);
+                    // Store numeric lat/lon for internal use; display formatted values
+                    currentLatitude = position.coords.latitude;
+                    currentLongitude = position.coords.longitude;
                     accuracyRadius = position.coords.accuracy;
-                    
-                    // Update monitoring panel UI
-                    geoCoords.textContent = `${currentLatitude}° N, ${currentLongitude}° E`;
+
+                    // Update monitoring panel UI (with hemisphere)
+                    geoCoords.textContent = formatLatLon(currentLatitude, currentLongitude);
                     geoStatus.textContent = `Accuracy: within ${Math.round(accuracyRadius)} meters`;
+
+                    // If a modal is open for SOS, update its map/link
+                    updateSosUI();
                 },
-                (error) => { /* Standard error handling for geolocation */ },
-                { 
-                    enableHighAccuracy: true, 
-                    timeout: 10000,           
-                    maximumAge: 0             
+                (error) => {
+                    // Error handler — show helpful user message
+                    console.warn('Geolocation error:', error);
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            geoCoords.textContent = "Location Permission Denied";
+                            geoStatus.textContent = "Enable location permissions in browser settings.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            geoCoords.textContent = "Position Unavailable";
+                            geoStatus.textContent = "Try moving to an open area.";
+                            break;
+                        case error.TIMEOUT:
+                            geoCoords.textContent = "Location Timeout";
+                            geoStatus.textContent = "Try again or check device settings.";
+                            break;
+                        default:
+                            geoCoords.textContent = "GPS Error";
+                            geoStatus.textContent = "Try again later.";
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
             );
         } else {
             geoCoords.textContent = "No GPS Support";
+            geoStatus.textContent = "Your device/browser does not support geolocation.";
         }
+
+        // Close modals when clicking the overlay (works reliably)
         window.addEventListener('click', (e) => {
-            if (e.target === safetyModal) safetyModal.classList.remove('active');
-            if (e.target === aftershockModal) aftershockModal.classList.remove('active');
+            // If clicked on any modal overlay (they have data-modal), close that overlay.
+            // Using class check to avoid accidental closure when clicking modal card.
+            const overlay = e.target.closest('.modal-overlay');
+            if (overlay && overlay.hasAttribute('data-modal')) {
+                overlay.classList.remove('active');
+            }
         });
+
+        // Accessibility: close modals with Esc
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+        // Make sure focus outlines are visible when navigating with keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') document.body.classList.add('user-is-tabbing');
+        });
+
+        // Small UX: if user clicks trigger and safety modal opens, ensure it is visible
+        // (already handled by CSS transitions)
     </script>
 </body>
 </html>
