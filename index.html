@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +9,12 @@
         :root {
             --primary-red: #e74c3c;
             --alert-red: #c0392b;
+            --sos-red: #ff0000;
             --text-dark: #2c3e50;
             --bg-light: #f4f6f7;
             --card-bg: #ffffff;
             --monitor-bg: #2c3e50;
-            --monitor-alert-bg: #96281b; /* Dark red for alert */
+            --monitor-alert-bg: #96281b;
         }
 
         * {
@@ -31,20 +33,7 @@
             overflow-x: hidden;
         }
 
-        /* --- Main Header --- */
-        header {
-            background: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            color: var(--text-dark);
-        }
-
-        /* --- Monitor Panel (Updated for Alert) --- */
+        /* --- Monitor Panel --- */
         .monitor-panel {
             background: var(--monitor-bg);
             color: white;
@@ -59,7 +48,6 @@
             transition: background 0.3s;
         }
 
-        /* Active Alert State Class */
         .monitor-panel.alert-active {
             background: var(--monitor-alert-bg);
             box-shadow: 0 0 25px rgba(231, 76, 60, 0.6);
@@ -87,7 +75,6 @@
             font-weight: bold;
         }
 
-        /* Alert State for Text */
         .monitor-panel.alert-active .status-indicator {
             color: #fff;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
@@ -105,7 +92,7 @@
         .monitor-panel.alert-active .status-dot {
             background-color: #e74c3c;
             box-shadow: 0 0 15px #e74c3c;
-            animation: blink 0.5s infinite; /* Faster blinking */
+            animation: blink 0.5s infinite;
         }
 
         .location-data {
@@ -128,7 +115,6 @@
             font-weight: bold;
         }
 
-        /* Radar Sweep Animation Background */
         .radar-sweep {
             position: absolute;
             top: -50%;
@@ -142,20 +128,31 @@
             z-index: 1;
         }
 
-        /* Red Radar for Alert */
         .monitor-panel.alert-active .radar-sweep {
             background: conic-gradient(from 0deg, transparent 0deg, rgba(231, 76, 60, 0.4) 60deg, transparent 60deg);
-            animation: radar 2s linear infinite; /* Faster sweep */
+            animation: radar 2s linear infinite;
         }
 
         @keyframes radar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         /* --- Main Content Area --- */
@@ -175,7 +172,7 @@
             max-width: 400px;
         }
 
-        /* --- The Emergency Button --- */
+        /* --- Emergency Button --- */
         .emergency-btn {
             background-color: var(--primary-red);
             color: white;
@@ -206,24 +203,26 @@
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
             }
+
             70% {
                 transform: scale(1);
                 box-shadow: 0 0 0 20px rgba(231, 76, 60, 0);
             }
+
             100% {
                 transform: scale(0.95);
                 box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
             }
         }
 
-        /* --- The Pop-Up Modal (Overlay) --- */
+        /* --- Modal System --- */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(44, 62, 80, 0.9);
+            background-color: rgba(44, 62, 80, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -239,7 +238,6 @@
             visibility: visible;
         }
 
-        /* --- Modal Content Card --- */
         .modal-card {
             background: white;
             width: 90%;
@@ -247,7 +245,6 @@
             border-radius: 20px;
             padding: 30px 20px;
             text-align: center;
-            position: relative;
             transform: translateY(50px);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-height: 90vh;
@@ -275,6 +272,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin-bottom: 20px;
         }
 
         .step {
@@ -294,6 +292,12 @@
             text-align: center;
         }
 
+        .step-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--primary-red);
+        }
+
         .step-text h3 {
             font-size: 1.1rem;
             margin-bottom: 4px;
@@ -304,33 +308,81 @@
             color: #666;
         }
 
-        /* --- Close Button --- */
-        .close-btn {
-            background: var(--text-dark);
+        /* --- Button Group (Safe vs Stuck) --- */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-safe {
+            background: #2ecc71;
             color: white;
             border: none;
             padding: 15px;
             width: 100%;
             border-radius: 10px;
-            margin-top: 25px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
         }
 
-        /* SVG Icon styling */
-        svg {
-            width: 40px;
-            height: 40px;
-            fill: var(--primary-red);
+        .btn-stuck {
+            background: var(--sos-red);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            animation: sos-pulse 1s infinite;
         }
 
+        @keyframes sos-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+            }
+
+            100% {
+                box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+            }
+        }
+
+        /* --- Location Box Styling --- */
+        .location-box {
+            background: #f8f9fa;
+            border: 2px dashed #95a5a6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
+        .coords-text {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .map-link {
+            display: inline-block;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body>
 
     <main>
-        <!-- New Monitor Panel in ALERT MODE -->
         <div class="monitor-panel alert-active">
             <div class="radar-sweep"></div>
             <div class="monitor-header">
@@ -344,78 +396,93 @@
                 Fetching Data...
             </div>
             <div class="location-sub" id="geoStatus">
-                ⚠️ MAG 6.5 TREMOR DETECTED
+                ⚠️ TREMOR DETECTED
             </div>
         </div>
 
-        <p class="subtitle">Tap the button below if you feel shaking.</p>
-        
+        <p class="subtitle">Tap below if you feel shaking.</p>
+
         <button class="emergency-btn" id="triggerBtn">
-            <svg viewBox="0 0 24 24" fill="white" style="fill:white; width: 32px; height: 32px;">
-                <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            <svg viewBox="0 0 24 24" fill="white" style="width: 32px; height: 32px;">
+                <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2v-4h2v4z" />
             </svg>
             Earthquake<br>Strikes
         </button>
-
     </main>
 
-    <!-- The Pop-up Modal -->
     <div class="modal-overlay" id="safetyModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h2>Earthquake!</h2>
+                <h2>Action Required</h2>
                 <p>Do this immediately</p>
             </div>
 
             <div class="steps-container">
-                <!-- Step 1 -->
                 <div class="step">
                     <div class="step-icon">
-                        <!-- Drop Icon (Simple representation) -->
                         <svg viewBox="0 0 24 24">
-                            <path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z"/>
+                            <path d="M4 15h16v2H4zm0 4h16v2H4zm8-17l-6 6h12l-6-6z" />
                         </svg>
                     </div>
                     <div class="step-text">
                         <h3>1. DROP</h3>
-                        <p>Drop to your hands and knees immediately.</p>
+                        <p>Drop to your hands and knees.</p>
                     </div>
                 </div>
-
-                <!-- Step 2 -->
                 <div class="step">
                     <div class="step-icon">
-                         <!-- Cover Icon -->
-                         <svg viewBox="0 0 24 24">
-                            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z"/>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 13h-2v-2h2v2z" />
                         </svg>
                     </div>
                     <div class="step-text">
                         <h3>2. COVER</h3>
-                        <p>Cover your head and neck. Crawl under a sturdy table.</p>
+                        <p>Cover head/neck. Get under a table.</p>
                     </div>
                 </div>
-
-                <!-- Step 3 -->
                 <div class="step">
                     <div class="step-icon">
-                        <!-- Hold On Icon -->
                         <svg viewBox="0 0 24 24">
-                            <path d="M18 9v4H6V9H4v6h16V9h-2zM4 15h16v2H4z"/>
+                            <path d="M18 9v4H6V9H4v6h16V9h-2zM4 15h16v2H4z" />
                         </svg>
                     </div>
                     <div class="step-text">
                         <h3>3. HOLD ON</h3>
-                        <p>Hold on to your shelter until the shaking stops.</p>
+                        <p>Stay until shaking stops.</p>
                     </div>
                 </div>
             </div>
 
-            <button class="close-btn" id="closeBtn">I am Safe</button>
+            <div class="button-group">
+                <button class="btn-safe" id="iAmSafeBtn">I am Safe</button>
+
+                <button class="btn-stuck" id="notSafeBtn">🚨 I AM STUCK / NEED HELP</button>
+            </div>
         </div>
     </div>
 
-    <!-- Second Pop-up: Aftershock Warning -->
+    <div class="modal-overlay" id="sosModal">
+        <div class="modal-card" style="border: 3px solid red;">
+            <div class="modal-header">
+                <h2 style="color: red;">SOS SIGNAL</h2>
+                <p>Rescuers need your location</p>
+            </div>
+
+            <p>Show this screen to rescuers or send these coordinates:</p>
+
+            <div class="location-box">
+                <span class="coords-text" id="sosCoords">Locating...</span>
+                <a href="#" target="_blank" class="map-link" id="googleMapLink">Open in Google Maps</a>
+            </div>
+
+            <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;">
+                Keep making noise. Do not light matches. Cover your mouth with cloth.
+            </p>
+
+            <button class="btn-safe" style="background: #34495e;" id="closeSosBtn">Close</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="aftershockModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -424,80 +491,162 @@
             </div>
             <div style="padding: 10px 0 20px 0;">
                 <p style="font-size: 1.1rem; line-height: 1.5; color: #2c3e50;">
-                    <strong>Do not return to damaged buildings immediately.</strong><br><br>
-                    Aftershocks are common and can cause further collapse. Stay in an open area if possible.
+                    <strong>Do not return to damaged buildings.</strong><br><br>
+                    Aftershocks are expected. Stay in open areas.
                 </p>
             </div>
-            <button class="close-btn" id="finalCloseBtn" style="background-color: #f39c12; color: #fff;">Understood</button>
+            <button class="btn-safe" style="background: #f39c12;" id="finalCloseBtn">Understood</button>
         </div>
     </div>
 
     <script>
-        // Get elements
+        // --- Elements ---
         const triggerBtn = document.getElementById('triggerBtn');
-        const closeBtn = document.getElementById('closeBtn');
-        const modal = document.getElementById('safetyModal');
-        const geoCoords = document.getElementById('geoCoords');
-        const geoStatus = document.getElementById('geoStatus');
-        
-        // Aftershock elements
+        const safetyModal = document.getElementById('safetyModal');
+        const iAmSafeBtn = document.getElementById('iAmSafeBtn');
+        const notSafeBtn = document.getElementById('notSafeBtn');
+
+        // SOS Elements
+        const sosModal = document.getElementById('sosModal');
+        const sosCoords = document.getElementById('sosCoords');
+        const googleMapLink = document.getElementById('googleMapLink');
+        const closeSosBtn = document.getElementById('closeSosBtn');
+
+        // Aftershock Elements
         const aftershockModal = document.getElementById('aftershockModal');
         const finalCloseBtn = document.getElementById('finalCloseBtn');
 
-        // Function to open main modal
+        // Display Elements
+        const geoCoords = document.getElementById('geoCoords');
+        const geoStatus = document.getElementById('geoStatus');
+
+        // Global Variables
+        let currentLatitude = null;
+        let currentLongitude = null;
+        let accuracyRadius = null;
+
+        // --- Event Listeners ---
+
+        // 1. Open Main Modal
         triggerBtn.addEventListener('click', () => {
-            modal.classList.add('active');
-            
-            // Optional: Vibrate device if supported (mobile feature)
-            if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]);
-            }
+            safetyModal.classList.add('active');
+            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
         });
 
-        // Function to switch to aftershock warning
-        closeBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-            // Open the warning modal after a short delay
+        // 2. "I am Safe" -> Goes to Aftershock Warning
+        iAmSafeBtn.addEventListener('click', () => {
+            safetyModal.classList.remove('active');
             setTimeout(() => {
                 aftershockModal.classList.add('active');
-            }, 200);
+            }, 300);
         });
 
-        // Final close
+        // 3. "I am Stuck" -> Opens SOS Modal AND Fetches Address
+        notSafeBtn.addEventListener('click', () => {
+            safetyModal.classList.remove('active');
+            sosModal.classList.add('active');
+            updateSosUI();
+            fetchAddress(currentLatitude, currentLongitude); // Fetch street address now
+        });
+
+        // 4. Close SOS
+        closeSosBtn.addEventListener('click', () => {
+            sosModal.classList.remove('active');
+        });
+
+        // 5. Close Final Warning
         finalCloseBtn.addEventListener('click', () => {
             aftershockModal.classList.remove('active');
         });
 
-        // Geolocation Logic
+        // --- Geolocation Logic ---
+
+        // Function to get Street Address from OpenStreetMap (Free API)
+        async function fetchAddress(lat, lon) {
+            if (!lat || !lon) return;
+
+            // Update text to show we are loading
+            sosCoords.innerHTML = `${lat}, ${lon}<br><span style="font-size:0.8rem; color:#666;">Fetching address...</span>`;
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                const data = await response.json();
+
+                if (data && data.display_name) {
+                    // Show Coordinates AND Address
+                    sosCoords.innerHTML = `
+                    <div style="font-size: 1.4rem; color: #c0392b;">${lat}, ${lon}</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; color: #333; border-top: 1px solid #ddd; padding-top: 5px;">
+                        ${data.display_name}
+                    </div>
+                `;
+                }
+            } catch (error) {
+                console.error("Address fetch failed", error);
+                sosCoords.innerHTML = `${lat}, ${lon}<br><span style="font-size:0.8rem; color:red;">Address unavailable (No Internet)</span>`;
+            }
+        }
+
+        function updateSosUI() {
+            if (currentLatitude && currentLongitude) {
+                // Update Google Maps Link with a pin drop
+                // "q=" puts a pin on the map at that specific spot
+                const mapUrl = `https://www.google.com/maps?q=$?q=${currentLatitude},${currentLongitude}`;
+
+                googleMapLink.href = mapUrl;
+                googleMapLink.textContent = "📍 Open Exact Location in Maps";
+                googleMapLink.style.display = "inline-block";
+            } else {
+                sosCoords.textContent = "Waiting for GPS Signal...";
+                googleMapLink.style.display = "none";
+            }
+        }
+
+        // Start Tracking Immediately
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(
                 (position) => {
-                    const lat = position.coords.latitude.toFixed(4);
-                    const lng = position.coords.longitude.toFixed(4);
-                    geoCoords.textContent = `${lat}° N, ${lng}° E`;
-                    // Keep the alert message even after coords load
-                    // geoStatus.textContent = "Monitoring Active Region"; 
+                    // High accuracy data
+                    currentLatitude = position.coords.latitude.toFixed(6); // 6 decimals = ~11cm precision
+                    currentLongitude = position.coords.longitude.toFixed(6);
+                    accuracyRadius = position.coords.accuracy; // Accuracy in meters
+
+                    // Update Main Monitor (show accuracy to user)
+                    geoCoords.textContent = `${currentLatitude}° N, ${currentLongitude}° E`;
+                    geoStatus.textContent = `Accuracy: within ${Math.round(accuracyRadius)} meters`;
                 },
                 (error) => {
-                    geoCoords.textContent = "Location Unavailable";
-                    // geoStatus.textContent = "Please enable GPS";
+                    // Error Handling
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            geoCoords.textContent = "Location Denied";
+                            geoStatus.textContent = "Please enable Location Access";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            geoCoords.textContent = "Signal Unavailable";
+                            break;
+                        case error.TIMEOUT:
+                            geoCoords.textContent = "Signal Timeout";
+                            break;
+                    }
                 },
-                { enableHighAccuracy: true }
+                {
+                    enableHighAccuracy: true, // IMPORTANT: Forces GPS hardware usage
+                    timeout: 10000,           // Wait 10s for a good signal
+                    maximumAge: 0             // Do not use cached/old positions
+                }
             );
         } else {
             geoCoords.textContent = "Not Supported";
-            geoStatus.textContent = "GPS required for tracking";
+            geoStatus.textContent = "Browser does not support GPS";
         }
 
-        // Close if clicking outside any open modal
+        // Close on outside click
         window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-            if (e.target === aftershockModal) {
-                aftershockModal.classList.remove('active');
-            }
+            if (e.target === safetyModal) safetyModal.classList.remove('active');
+            if (e.target === aftershockModal) aftershockModal.classList.remove('active');
         });
     </script>
 </body>
+
 </html>
