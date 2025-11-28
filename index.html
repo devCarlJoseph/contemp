@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Earthquake Safety and SOS App — Full</title>
+    <title>Earthquake Safety and SOS App — Full Version</title>
     <style>
-        /* --- Your existing CSS remains unchanged, plus new modal styles --- */
+        /* --- CSS STYLES --- */
         :root {
             --primary-red: #e74c3c;
             --alert-red: #c0392b;
@@ -368,6 +368,7 @@
             color: var(--text-dark);
             margin-bottom: 10px;
             display: block;
+            cursor: pointer;
         }
 
         .map-link {
@@ -382,26 +383,6 @@
             font-size: 0.85rem;
             color: #777;
             margin-top: 8px;
-        }
-
-        /* --- New Modal for Emergency Responses --- */
-        #emergencyResponsesModal .modal-card {
-            max-width: 500px;
-        }
-
-        .response-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-
-        .response-item:last-child {
-            border-bottom: none;
-        }
-
-        .response-item a {
-            color: #2980b9;
-            text-decoration: none;
         }
     </style>
 </head>
@@ -429,71 +410,154 @@
             </svg>
             Earthquake<br>Strikes
         </button>
-
-        <button class="btn-safe" id="viewResponsesBtn" style="margin-top:20px;width:200px;">View Emergency
-            Responses</button>
     </main>
 
-    <!-- Existing Safety, SOS, Aftershock Modals remain unchanged ... -->
-
-    <!-- Emergency Responses Modal -->
-    <div class="modal-overlay" id="emergencyResponsesModal" data-modal>
-        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="responsesTitle">
+    <!-- Safety Modal -->
+    <div class="modal-overlay" id="safetyModal" data-modal>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="safetyTitle">
             <div class="modal-header">
-                <h2 id="responsesTitle" style="color:#e67e22;">Emergency Responses</h2>
-                <p>Victim Locations</p>
+                <h2 id="safetyTitle">Action Required</h2>
+                <p>Do this immediately</p>
             </div>
-            <div id="responsesList" style="max-height:60vh;overflow-y:auto;"></div>
-            <button class="btn-safe" style="background:#34495e;margin-top:15px;" id="closeResponsesBtn">Close</button>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-icon">1</div>
+                    <div class="step-text">
+                        <h3>DROP</h3>
+                        <p>Drop to your hands and knees.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">2</div>
+                    <div class="step-text">
+                        <h3>COVER</h3>
+                        <p>Cover head/neck. Get under a table.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-icon">3</div>
+                    <div class="step-text">
+                        <h3>HOLD ON</h3>
+                        <p>Stay until shaking stops.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-safe" id="iAmSafeBtn">I am Safe</button>
+                <button class="btn-stuck" id="notSafeBtn">🚨 I AM STUCK / NEED HELP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Modal -->
+    <div class="modal-overlay" id="sosModal" data-modal>
+        <div class="modal-card" style="border: 3px solid red;" role="dialog" aria-modal="true"
+            aria-labelledby="sosTitle">
+            <div class="modal-header">
+                <h2 id="sosTitle" style="color: red;">SOS SIGNAL</h2>
+                <p>Rescuers need your location</p>
+            </div>
+            <div class="location-box">
+                <span class="coords-text" id="sosCoords">Locating...</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="map-link" id="googleMapLink"
+                    aria-label="Open location in Google Maps" style="display:none;">Open in Google Maps</a>
+                <div class="small-note" id="sosNote" style="display:none;"></div>
+            </div>
+            <button class="btn-safe" style="background: #34495e;" id="closeSosBtn">Close</button>
         </div>
     </div>
 
     <script>
-        // --- Existing JS for Safety/SOS panel remains ---
-        // Add variables for new modal
-        const viewResponsesBtn = document.getElementById('viewResponsesBtn');
-        const emergencyResponsesModal = document.getElementById('emergencyResponsesModal');
-        const responsesList = document.getElementById('responsesList');
-        const closeResponsesBtn = document.getElementById('closeResponsesBtn');
+        const triggerBtn = document.getElementById('triggerBtn');
+        const safetyModal = document.getElementById('safetyModal');
+        const iAmSafeBtn = document.getElementById('iAmSafeBtn');
+        const notSafeBtn = document.getElementById('notSafeBtn');
+        const sosModal = document.getElementById('sosModal');
+        const sosCoords = document.getElementById('sosCoords');
+        const googleMapLink = document.getElementById('googleMapLink');
+        const closeSosBtn = document.getElementById('closeSosBtn');
+        const geoCoords = document.getElementById('geoCoords');
+        const geoStatus = document.getElementById('geoStatus');
+        const sosNote = document.getElementById('sosNote');
 
-        // Function to fetch emergency responses from backend
-        async function fetchEmergencyResponses() {
-            responsesList.innerHTML = "<p>Loading...</p>";
-            if (!RESCUER_API_ENDPOINT) {
-                responsesList.innerHTML = "<p>Backend not configured.</p>";
-                return;
-            }
-            try {
-                const resp = await fetch(RESCUER_API_ENDPOINT);
-                const data = await resp.json();
-                if (!data) { responsesList.innerHTML = "<p>No responses yet.</p>"; return; }
-                responsesList.innerHTML = "";
-                Object.entries(data).forEach(([key, value]) => {
-                    const lat = value.latitude || "—";
-                    const lon = value.longitude || "—";
-                    const address = value.human_address || "No address";
-                    const mapUrl = value.map_link || `https://www.google.com/maps?q=${lat},${lon}`;
-                    const div = document.createElement('div');
-                    div.classList.add('response-item');
-                    div.innerHTML = `<strong>Coords:</strong> ${lat}, ${lon}<br><strong>Address:</strong> ${address}<br><a href="${mapUrl}" target="_blank">View on Map</a>`;
-                    responsesList.appendChild(div);
-                });
-            } catch (e) {
-                responsesList.innerHTML = "<p>Error fetching data.</p>";
-                console.error(e);
+        let currentLatitude = null;
+        let currentLongitude = null;
+        let accuracyRadius = null;
+        let currentAddress = "";
+
+        function formatLatLon(lat, lon) {
+            if (lat === null || lon === null) return "Unknown";
+            const latHem = lat >= 0 ? "N" : "S";
+            const lonHem = lon >= 0 ? "E" : "W";
+            return `${lat.toFixed(6)}° ${latHem}, ${lon.toFixed(6)}° ${lonHem}`;
+        }
+        function buildGoogleMapsUrl(lat, lon) {
+            return `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`;
+        }
+
+        // Trigger safety modal
+        triggerBtn.addEventListener('click', () => {
+            safetyModal.classList.add('active');
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        });
+
+        // Safe button closes modal
+        iAmSafeBtn.addEventListener('click', () => {
+            safetyModal.classList.remove('active');
+        });
+
+        // "Need Help" opens SOS modal
+        notSafeBtn.addEventListener('click', () => {
+            safetyModal.classList.remove('active');
+            sosModal.classList.add('active');
+            updateSosUI();
+        });
+
+        // Close SOS
+        closeSosBtn.addEventListener('click', () => sosModal.classList.remove('active'));
+
+        // Update SOS modal
+        function updateSosUI() {
+            if (currentLatitude !== null && currentLongitude !== null) {
+                sosCoords.innerHTML = `<div style="font-size:1.4rem;color:#c0392b;">${currentLatitude.toFixed(6)}, ${currentLongitude.toFixed(6)}</div>`;
+                googleMapLink.href = buildGoogleMapsUrl(currentLatitude, currentLongitude);
+                googleMapLink.style.display = 'inline-block';
+            } else {
+                sosCoords.textContent = "Waiting for GPS Signal...";
+                googleMapLink.style.display = 'none';
             }
         }
 
-        // Button event listeners
-        viewResponsesBtn.addEventListener('click', async () => {
-            emergencyResponsesModal.classList.add('active');
-            await fetchEmergencyResponses();
-        });
-        closeResponsesBtn.addEventListener('click', () => {
-            emergencyResponsesModal.classList.remove('active');
-        });
+        // Geolocation
+        if ("geolocation" in navigator) {
+            navigator.geolocation.watchPosition(pos => {
+                currentLatitude = pos.coords.latitude;
+                currentLongitude = pos.coords.longitude;
+                accuracyRadius = pos.coords.accuracy;
+                geoCoords.textContent = formatLatLon(currentLatitude, currentLongitude);
+                geoStatus.textContent = `Accuracy: within ${Math.round(accuracyRadius)} meters`;
+                updateSosUI();
+            }, error => {
+                geoCoords.textContent = "Location Error";
+                geoStatus.textContent = "Enable GPS / permissions";
+            }, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            });
+        } else {
+            geoCoords.textContent = "No GPS Support";
+            geoStatus.textContent = "Browser does not support geolocation";
+        }
 
-        // --- Existing geolocation/watchPosition & modal handling already in your previous script ---
+        // Close modals clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', e => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 
